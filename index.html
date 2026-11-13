@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corte Já - AZ Manutenções</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <!-- Configuração do PWA (Instalável) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#22c55e">
+</head>
+<body class="bg-black text-white h-screen flex flex-col justify-between overflow-hidden relative">
+
+    <!-- TELA DE SPLASH -->
+    <div id="splash-screen" class="fixed inset-0 bg-black flex flex-col items-center justify-center z-50 transition-opacity duration-1000">
+        <div class="w-36 h-36 bg-green-500 rounded-2xl flex items-center justify-center shadow-lg">
+            <span class="text-5xl">🌿</span>
+        </div>
+        <h1 class="mt-4 text-green-500 font-bold text-2xl tracking-wider">Corte Já</h1>
+        <p class="text-xs text-gray-400 mt-1">AZ Manutenções</p>
+    </div>
+
+    <!-- TELA 0: CADASTRO INICIAL OBRIGATÓRIO (PRIMEIRA PÁGINA) -->
+    <div id="screen-cliente-dados" class="flex-1 flex flex-col justify-center items-center px-6 hidden overflow-y-auto py-6">
+        <div class="w-full max-w-xs bg-zinc-900 border border-green-500/30 rounded-2xl p-5 shadow-2xl">
+            <div class="text-center mb-4">
+                <span class="text-3xl">🌿</span>
+                <h3 class="text-lg font-bold text-green-400 mt-2">Corte Já</h3>
+                <p class="text-xs text-gray-400 mt-1">Informe seu nome e sobrenome para continuar</p>
+            </div>
+
+            <div class="mb-3">
+                <label class="block text-xs text-gray-400 mb-1">Nome</label>
+                <input type="text" id="cli-nome" placeholder="Digite seu nome" class="w-full bg-black border border-zinc-700 text-white text-xs py-2.5 px-3 rounded-xl focus:outline-none focus:border-green-500">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-xs text-gray-400 mb-1">Sobrenome</label>
+                <input type="text" id="cli-sobrenome" placeholder="Digite seu sobrenome" class="w-full bg-black border border-zinc-700 text-white text-xs py-2.5 px-3 rounded-xl focus:outline-none focus:border-green-500">
+            </div>
+
+            <button onclick="salvarDadosCliente()" class="w-full bg-green-500 text-black font-bold py-2.5 rounded-xl hover:bg-green-400 transition-all text-xs shadow-md">
+                Avançar para os Serviços ➡
+            </button>
+        </div>
+    </div>
+
+    <!-- TELA 1: MENU PRINCIPAL (SELEÇÃO DE LOCAL - SÓ APARECE DEPOIS DO CADASTRO) -->
+    <div id="screen-home" class="flex-1 flex flex-col justify-center items-center px-6 hidden overflow-y-auto py-6">
+        
+        <div class="text-center mb-6">
+            <h2 id="saudacao-cliente" class="text-xl font-bold text-green-400">Selecione o Local</h2>
+            <p class="text-gray-400 text-xs mt-1">Escolha o tipo de área para o serviço</p>
+        </div>
+
+        <div class="w-full max-w-xs flex flex-col gap-3">
+            
+            <button onclick="abrirFormulario('Pomar', 0.80)" class="w-full bg-white text-black font-semibold py-3.5 px-5 rounded-xl shadow-md hover:bg-green-500 hover:text-white transition-all flex items-center justify-between">
+                <span class="text-lg font-bold">Pomar</span>
+                <span class="text-2xl">🍎</span>
+            </button>
+
+            <button onclick="abrirFormulario('Casa', 1.20)" class="w-full bg-white text-black font-semibold py-3.5 px-5 rounded-xl shadow-md hover:bg-green-500 hover:text-white transition-all flex items-center justify-between">
+                <span class="text-lg font-bold">Casa</span>
+                <span class="text-2xl">🏠</span>
+            </button>
+
+            <button onclick="abrirFormulario('Pousada', 1.50)" class="w-full bg-white text-black font-semibold py-3.5 px-5 rounded-xl shadow-md hover:bg-green-500 hover:text-white transition-all flex items-center justify-between">
+                <span class="text-lg font-bold">Pousada</span>
+                <span class="text-2xl">🏨</span>
+            </button>
+
+            <button onclick="abrirFormulario('Terreno / Outros', 1.20)" class="w-full bg-white text-black font-semibold py-3.5 px-5 rounded-xl shadow-md hover:bg-green-500 hover:text-white transition-all flex items-center justify-between">
+                <div class="text-left">
+                    <span class="text-lg font-bold block">Terreno / Outros</span>
+                    <span class="text-xs text-gray-600">Áreas abertas e baldios</span>
+                </div>
+                <span class="text-2xl">⚙️</span>
+            </button>
+
+        </div>
+    </div>
+
+    <!-- TELA DE LOGIN DO ADMINISTRADOR -->
+    <div id="screen-login" class="flex-1 flex flex-col justify-center items-center px-6 hidden">
+        <div class="w-full max-w-xs bg-zinc-900 border border-green-500/30 rounded-2xl p-5 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-base font-bold text-green-400">Acesso Restrito</h3>
+                <button onclick="voltarHome()" class="text-gray-400 hover:text-white text-xs">⬅ Voltar</button>
+            </div>
+
+            <div class="mb-3">
+                <label class="block text-xs text-gray-400 mb-1">Usuário</label>
+                <input type="text" id="login-usuario" placeholder="Digite seu usuário" class="w-full bg-black border border-zinc-700 text-white text-xs py-2.5 px-3 rounded-xl focus:outline-none focus:border-green-500">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-xs text-gray-400 mb-1">Senha</label>
+                <input type="password" id="login-senha" placeholder="Digite sua senha" class="w-full bg-black border border-zinc-700 text-white text-xs py-2.5 px-3 rounded-xl focus:outline-none focus:border-green-500">
+            </div>
+
+            <button onclick="fazerLogin()" class="w-full bg-green-500 text-black font-bold py-2.5 rounded-xl hover:bg-green-400 transition-all text-xs shadow-md">
+                Entrar no Painel 🔓
+            </button>
+        </div>
+    </div>
+
+    <!-- TELA 2: FORMULÁRIO DO CLIENTE (CÁLCULO E AGENDAMENTO) -->
+    <div id="screen-calc" class="flex-1 flex flex-col justify-center items-center px-6 hidden overflow-y-auto py-6">
+        <div class="w-full max-w-xs bg-zinc-900 border border-green-500/30 rounded-2xl p-5 shadow-2xl">
+            
+            <div class="flex justify-between items-center mb-3">
+                <h3 id="titulo-categoria" class="text-lg font-bold text-green-400">Categoria</h3>
+                <button onclick="voltarHome()" class="text-gray-400 hover:text-white text-xs">⬅ Voltar</button>
+            </div>
+
+            <!-- SELEÇÃO DE MODO -->
+            <div class="mb-2">
+                <label class="block text-xs text-gray-400 mb-1.5">Escolha o Tipo de Corte</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button" id="btn-simples" onclick="selecionarModo('simples')" class="py-2 px-1 rounded-xl text-xs font-bold transition-all bg-green-500 text-black border border-green-500 shadow">
+                        Corte Simples
+                    </button>
+                    <button type="button" id="btn-limpeza" onclick="selecionarModo('limpeza')" class="py-2 px-1 rounded-xl text-xs font-bold transition-all bg-black text-gray-300 border border-zinc-700 hover:border-green-500">
+                        Com Limpeza
+                    </button>
+                </div>
+            </div>
+
+            <!-- CAIXINHA DE VALOR POR METRO -->
+            <div id="info-preco-metro" class="text-center text-xs text-green-300 bg-zinc-800/80 py-1.5 px-3 rounded-lg mb-3 border border-green-500/20">
+                Valor base: R$ 0,00 / m²
+            </div>
+
+            <!-- Metros Quadrados -->
+            <div class="mb-2.5">
+                <label class="block text-xs text-gray-400 mb-1">Tamanho da área (Metros Quadrados)</label>
+                <input type="number" id="input-metros" placeholder="Ex: 300" oninput="recalcular()" class="w-full bg-black border border-zinc-700 text-white text-center text-sm font-bold py-2 rounded-xl focus:outline-none focus:border-green-500">
+            </div>
+
+            <!-- Data e Turno -->
+            <div class="grid grid-cols-2 gap-2 mb-2.5">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Data</label>
+                    <input type="date" id="input-data" class="w-full bg-black border border-zinc-700 text-white text-center text-xs py-2 rounded-xl focus:outline-none focus:border-green-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Turno</label>
+                    <select id="input-turno" class="w-full bg-black border border-zinc-700 text-white text-center text-xs py-2 rounded-xl focus:outline-none focus:border-green-500">
+                        <option value="Manhã">Manhã</option>
+                        <option value="Tarde">Tarde</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Resumo do Valor Total -->
+            <div id="resumo-valor" class="text-xs text-gray-300 mb-3 bg-zinc-800/60 py-2.5 rounded-xl text-center">
+                Valor Total: <span class="text-green-400 font-bold text-sm">R$ 0,00</span>
+            </div>
+
+            <!-- CHAVE PIX -->
+            <div class="bg-black/60 border border-green-500/30 p-2.5 rounded-xl mb-4 text-center">
+                <span class="block text-[10px] text-gray-400 uppercase tracking-wider">Chave Pix (CPF)</span>
+                <span class="text-xs font-mono font-bold text-green-400 select-all">113.410.859-10</span>
+                <span class="block text-[9px] text-gray-500 mt-0.5">Alex dos Santos Zago</span>
+            </div>
+
+            <!-- Botão de Envio -->
+            <button onclick="finalizarAgendamento()" class="w-full bg-green-500 text-black font-bold py-2.5 rounded-xl hover:bg-green-400 transition-all text-xs shadow-md">
+                Confirmar e Enviar no WhatsApp 💬
+            </button>
+        </div>
+    </div>
+
+    <!-- TELA 3: PAINEL ADMINISTRATIVO AVANÇADO -->
+    <div id="screen-admin" class="flex-1 flex flex-col px-4 py-4 hidden overflow-y-auto">
+        <div class="flex justify-between items-center mb-3">
+            <div>
+                <h3 class="text-lg font-bold text-green-400">Painel Administrativo</h3>
+                <p class="text-[11px] text-gray-400">AZ Manutenções (Agenda Inteligente)</p>
+            </div>
+            <button onclick="voltarHome()" class="bg-zinc-800 text-white text-xs px-3 py-1.5 rounded-lg border border-zinc-700">Sair ⬅</button>
+        </div>
+
+        <!-- BLOQUEIO DE AGENDA / FOLGA -->
+        <div class="bg-zinc-900 border border-green-500/30 rounded-xl p-3 mb-3 shadow-lg">
+            <h4 class="text-xs font-bold text-green-400 uppercase tracking-wider mb-2">🔒 Bloquear Turno / Folga</h4>
+            <div class="grid grid-cols-2 gap-2 mb-2">
+                <div>
+                    <label class="block text-[10px] text-gray-400 mb-1">Data do Bloqueio</label>
+                    <input type="date" id="bloqueio-data" class="w-full bg-black border border-zinc-700 text-white text-center text-xs py-1.5 rounded-lg focus:outline-none focus:border-green-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-gray-400 mb-1">Turno</label>
+                    <select id="bloqueio-turno" class="w-full bg-black border border-zinc-700 text-white text-center text-xs py-1.5 rounded-lg focus:outline-none focus:border-green-500">
+                        <option value="Manhã">Manhã</option>
+                        <option value="Tarde">Tarde</option>
+                        <option value="Dia Inteiro">Dia Inteiro</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="bloquearAgendaAdmin()" class="w-full bg-zinc-800 border border-green-500/40 text-green-400 font-bold py-1.5 rounded-lg hover:bg-green-500 hover:text-black transition-all text-xs">
+                Bloquear este Horário na Agenda 🚫
+            </button>
+        </div>
+
+        <!-- FILTRO DE PERÍODO E FATURAMENTO -->
+        <div class="bg-zinc-900 border border-green-500/30 rounded-xl p-3 mb-3 shadow-lg">
+            <div class="flex justify-between items-center mb-2 pb-2 border-b border-zinc-800">
+                <span class="text-xs text-gray-400 font-semibold">Período do Relatório:</span>
+                <input type="month" id="filtro-mes-ano" onchange="carregarPainelAdmin()" class="bg-black border border-zinc-700 text-green-400 text-xs px-2 py-1 rounded-lg focus:outline-none focus:border-green-500">
+            </div>
+            <div class="flex justify-between items-center">
+                <div>
+                    <span class="text-[11px] text-gray-400 block">Faturamento Concluído</span>
+                    <span id="faturamento-mes" class="text-base font-bold text-green-400">R$ 0,00</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-[11px] text-gray-400 block">Total de OS</span>
+                    <span id="total-os" class="text-base font-bold text-white">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRÁFICO VISUAL DE STATUS -->
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3 mb-3 shadow-lg">
+            <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">📊 Gráfico de Progresso do Mês</h4>
+            
+            <div class="w-full bg-black h-3 rounded-full overflow-hidden flex mb-3 border border-zinc-700">
+                <div id="barra-concluida" class="bg-green-500 h-full transition-all duration-500" style="width: 0%"></div>
+                <div id="barra-pendente" class="bg-yellow-500 h-full transition-all duration-500" style="width: 0%"></div>
+                <div id="barra-cancelada" class="bg-red-500 h-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-1 text-center text-[10px]">
+                <div class="bg-black/40 p-1.5 rounded border border-zinc-800">
+                    <span class="block text-green-400 font-bold" id="qtd-concluida">0</span>
+                    <span class="text-gray-400">Concluídas</span>
+                </div>
+                <div class="bg-black/40 p-1.5 rounded border border-zinc-800">
+                    <span class="block text-yellow-400 font-bold" id="qtd-pendente">0</span>
+                    <span class="text-gray-400">Pendentes</span>
+                </div>
+                <div class="bg-black/40 p-1.5 rounded border border-zinc-800">
+                    <span class="block text-red-400 font-bold" id="qtd-cancelada">0</span>
+                    <span class="text-gray-400">Canceladas</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BARRA DE PESQUISA E FILTROS -->
+        <div class="flex flex-col gap-2 mb-3">
+            <input type="text" id="busca-os" oninput="carregarPainelAdmin()" placeholder="🔍 Buscar por OS, cliente ou notas..." class="w-full bg-zinc-900 border border-zinc-800 text-xs py-2 px-3 rounded-xl focus:outline-none focus:border-green-500 text-white">
+            
+            <div class="grid grid-cols-4 gap-1 text-[10px] font-bold">
+                <button onclick="mudarFiltroStatus('Todos')" id="btn-filtro-Todos" class="py-1.5 rounded-lg border bg-green-500 text-black border-green-500">Todos</button>
+                <button onclick="mudarFiltroStatus('Pendente')" id="btn-filtro-Pendente" class="py-1.5 rounded-lg border bg-zinc-900 text-gray-300 border-zinc-800">Pendentes</button>
+                <button onclick="mudarFiltroStatus('Concluída')" id="btn-filtro-Concluída" class="py-1.5 rounded-lg border bg-zinc-900 text-gray-300 border-zinc-800">Concluídas</button>
+                <button onclick="mudarFiltroStatus('Cancelada')" id="btn-filtro-Cancelada" class="py-1.5 rounded-lg border bg-zinc-900 text-gray-300 border-zinc-800">Canceladas</button>
+            </div>
+        </div>
+
+        <!-- LISTA DE ORDENS DE SERVIÇO -->
+        <div class="flex justify-between items-center mb-2">
+            <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider">Ordens de Serviço e Bloqueios</h4>
+        </div>
+
+        <div id="lista-os" class="flex flex-col gap-3 pb-6">
+            <div class="text-center text-xs text-gray-500 py-8 bg-zinc-900/40 rounded-xl border border-zinc-800">
+                Carregando agenda do Firebase...
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTÃO WHATSAPP FLUTUANTE -->
+    <a href="https://api.whatsapp.com/send?phone=5549991810323&text=Olá%20Zago,%20vim%20pelo%20aplicativo%20Corte%20Já." 
+       target="_blank" 
+       class="fixed bottom-5 right-5 bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition-all flex items-center justify-center z-40">
+        <span class="font-bold text-sm">💬 WhatsApp</span>
+    </a>
+
+    <!-- RODAPÉ COM ACESSO ADMIN OCULTO -->
+    <footer onclick="tratarCliquesAdm()" class="text-center py-4 text-xs text-gray-600 select-none cursor-pointer active:opacity-80">
+        AZ Manutenções &copy; 2026
+    </footer>
+
+    <!-- SCRIPT FIREBASE E LÓGICA DO APP -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-analytics.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+
+        const ADMIN_USER = "Alex";
+        const ADMIN_PASS = "151219";
+
+        let clienteNomeCompleto = '';
+        let categoriaSelecionada = '';
+        let precoBasePorMetro = 0;
+        let tipoModoAtual = 'simples';
+        let filtroStatusAtual = 'Todos';
+        
+        let cliquesAdmContador = 0;
+        let tempoUltimoClique = 0;
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAPgIyWCJvgD5vHR0XOM2uMdK4Cc8-YnbQ",
+            authDomain: "corte-ja-v8.firebaseapp.com",
+            projectId: "corte-ja-v8",
+            storageBucket: "corte-ja-v8.firebasestorage.app",
+            messagingSenderId: "686913628139",
+            appId: "1:686913628139:web:f46876fd3a6b7ab2afdbae",
+            measurementId: "G-3KTQBFV6QX"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        let listaOrdensCache = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const hoje = new Date();
+            const anoMes = hoje.toISOString().slice(0, 7);
+            document.getElementById('filtro-mes-ano').value = anoMes;
+
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    
+                    // SEMPRE limpa e força o cadastro inicial ao abrir o app
+                    localStorage.removeItem('corteja_cliente_nome');
+                    document.getElementById('cli-nome').value = '';
+                    document.getElementById('cli-sobrenome').value = '';
+                    document.getElementById('screen-cliente-dados').classList.remove('hidden');
+                }, 500);
+            }, 1200);
+
+            onSnapshot(collection(db, "ordens"), (snapshot) => {
+                listaOrdensCache = [];
+                snapshot.forEach((documento) => {
+                    listaOrdensCache.push({
+                        firebaseId: documento.id,
+                        ...documento.data()
+                    });
+                });
+                listaOrdensCache.sort((a, b) => new Date(b.criadoEm || 0) - new Date(a.criadoEm || 0));
+                
+                if (!document.getElementById('screen-admin').classList.contains('hidden')) {
+                    renderizarPainelAdmin();
+                }
+            }, (erro) => {
+                console.error("Erro ao sincronizar Firestore:", erro);
+            });
+        });
+
+        window.salvarDadosCliente = function() {
+            const nome = document.getElementById('cli-nome').value.trim();
+            const sobrenome = document.getElementById('cli-sobrenome').value.trim();
+
+            if (!nome || !sobrenome) {
+                alert('Por favor, informe seu nome e sobrenome.');
+                return;
+            }
+
+            clienteNomeCompleto = `${nome} ${sobrenome}`;
+            
+            document.getElementById('screen-cliente-dados').classList.add('hidden');
+            mostrarHome();
+        }
+
+        function mostrarHome() {
+            const home = document.getElementById('screen-home');
+            home.classList.remove('hidden');
+        }
+
+        window.tratarCliquesAdm = function() {
+            const agora = new Date().getTime();
+            if (agora - tempoUltimoClique > 800) {
+                cliquesAdmContador = 1;
+            } else {
+                cliquesAdmContador++;
+            }
+            tempoUltimoClique = agora;
+
+            if (cliquesAdmContador >= 3) {
+                cliquesAdmContador = 0;
+                irParaLogin();
+            }
+        }
+
+        window.irParaLogin = function() {
+            document.getElementById('screen-cliente-dados').classList.add('hidden');
+            document.getElementById('screen-home').classList.add('hidden');
+            document.getElementById('screen-calc').classList.add('hidden');
+            document.getElementById('screen-admin').classList.add('hidden');
+            document.getElementById('login-usuario').value = '';
+            document.getElementById('login-senha').value = '';
+            document.getElementById('screen-login').classList.remove('hidden');
+        }
+
+        window.fazerLogin = function() {
+            const u = document.getElementById('login-usuario').value.trim();
+            const p = document.getElementById('login-senha').value.trim();
+
+            if (u === ADMIN_USER && p === ADMIN_PASS) {
+                document.getElementById('screen-login').classList.add('hidden');
+                document.getElementById('screen-admin').classList.remove('hidden');
+                renderizarPainelAdmin();
+            } else {
+                alert('Usuário ou senha incorretos!');
+            }
+        }
+
+        window.abrirFormulario = function(categoria, precoBase) {
+            categoriaSelecionada = categoria;
+            precoBasePorMetro = precoBase;
+            tipoModoAtual = 'simples'; 
+            
+            document.getElementById('titulo-categoria').innerText = categoria;
+            document.getElementById('input-metros').value = '';
+            document.getElementById('input-data').value = '';
+            
+            atualizarInterfaceModo();
+
+            document.getElementById('screen-cliente-dados').classList.add('hidden');
+            document.getElementById('screen-home').classList.add('hidden');
+            document.getElementById('screen-login').classList.add('hidden');
+            document.getElementById('screen-admin').classList.add('hidden');
+            document.getElementById('screen-calc').classList.remove('hidden');
+        }
+
+        window.voltarHome = function() {
+            document.getElementById('screen-calc').classList.add('hidden');
+            document.getElementById('screen-login').classList.add('hidden');
+            document.getElementById('screen-admin').classList.add('hidden');
+            document.getElementById('screen-home').classList.remove('hidden');
+        }
+
+        window.selecionarModo = function(modo) {
+            tipoModoAtual = modo;
+            atualizarInterfaceModo();
+            recalcular();
+        }
+
+        function atualizarInterfaceModo() {
+            const btnSimples = document.getElementById('btn-simples');
+            const btnLimpeza = document.getElementById('btn-limpeza');
+            const infoPreco = document.getElementById('info-preco-metro');
+
+            let precoMetroAtual = precoBasePorMetro;
+            let textoModoDescricao = 'Corte Simples';
+            
+            if (tipoModoAtual === 'simples') {
+                btnSimples.className = "py-2 px-1 rounded-xl text-xs font-bold transition-all bg-green-500 text-black border border-green-500 shadow";
+                btnLimpeza.className = "py-2 px-1 rounded-xl text-xs font-bold transition-all bg-black text-gray-300 border border-zinc-700 hover:border-green-500";
+            } else {
+                btnSimples.className = "py-2 px-1 rounded-xl text-xs font-bold transition-all bg-black text-gray-300 border border-zinc-700 hover:border-green-500";
+                btnLimpeza.className = "py-2 px-1 rounded-xl text-xs font-bold transition-all bg-green-500 text-black border border-green-500 shadow";
+                precoMetroAtual += 0.30;
+                textoModoDescricao = 'Corte com Limpeza';
+            }
+
+            infoPreco.innerText = `${textoModoDescricao}: R$ ${precoMetroAtual.toFixed(2).replace('.', ',')} por m²`;
+        }
+
+        window.recalcular = function() {
+            const metros = parseFloat(document.getElementById('input-metros').value) || 0;
+            let precoMetroFinal = precoBasePorMetro;
+            if (tipoModoAtual === 'limpeza') {
+                precoMetroFinal += 0.30;
+            }
+            const total = metros * precoMetroFinal;
+            document.querySelector('#resumo-valor span').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+
+        function verificarConflitoAgenda(dataDesejada, turnoDesejado) {
+            return listaOrdensCache.some(os => {
+                if (os.status === 'Cancelada') return false;
+                if (os.data === dataDesejada) {
+                    if (os.turno === 'Dia Inteiro' || turnoDesejado === 'Dia Inteiro' || os.turno === turnoDesejado) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+        }
+
+        window.finalizarAgendamento = async function() {
+            const metros = document.getElementById('input-metros').value;
+            const data = document.getElementById('input-data').value;
+            const turno = document.getElementById('input-turno').value;
+
+            if (!metros || metros <= 0) {
+                alert('Por favor, informe a quantidade de metros quadrados.');
+                return;
+            }
+            if (!data) {
+                alert('Por favor, selecione a data desejada.');
+                return;
+            }
+
+            if (verificarConflitoAgenda(data, turno)) {
+                alert(`⚠️ Atenção: O turno da ${turno} para o dia ${data.split('-').reverse().join('/')} já está ocupado ou reservado/bloqueado. Por favor, escolha outra data ou turno.`);
+                return;
+            }
+
+            let precoMetroFinal = precoBasePorMetro;
+            if (tipoModoAtual === 'limpeza') {
+                precoMetroFinal += 0.30;
+            }
+
+            const valorTotalNum = parseFloat(metros) * precoMetroFinal;
+            const totalStr = valorTotalNum.toFixed(2).replace('.', ',');
+            const nomeModo = tipoModoAtual === 'simples' ? 'Corte Simples' : 'Corte com Limpeza';
+            const numOS = 'OS #' + Math.floor(100 + Math.random() * 900);
+
+            const novaOS = {
+                id: numOS,
+                cliente: clienteNomeCompleto,
+                categoria: categoriaSelecionada,
+                modo: nomeModo,
+                metros: parseFloat(metros),
+                valorBase: valorTotalNum,
+                valorAdicional: 0,
+                valorTotal: valorTotalNum,
+                data: data,
+                turno: turno,
+                status: 'Pendente',
+                observacoes: '',
+                criadoEm: new Date().toISOString()
+            };
+
+            const partesData = data.split('-');
+            const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]}`;
+            
+            const textoMensagem = 
+`Olá Zago! Gostaria de agendar um serviço pelo aplicativo Corte Já:
+
+👤 *Cliente:* ${clienteNomeCompleto}
+📌 *${numOS}*
+🌿 *Categoria:* ${categoriaSelecionada}
+✂️ *Modo:* ${nomeModo}
+📐 *Área:* ${metros} m²
+💰 *Valor Total:* R$ ${totalStr}
+📅 *Data:* ${dataFormatada} (${turno})
+
+Como podemos prosseguir?`;
+
+            const urlWhatsApp = `https://api.whatsapp.com/send?phone=5549991810323&text=${encodeURIComponent(textoMensagem)}`;
+            window.open(urlWhatsApp, '_blank');
+
+            try {
+                await addDoc(collection(db, "ordens"), novaOS);
+            } catch (erro) {
+                console.error("Erro ao salvar no Firebase:", erro);
+            }
+        }
+
+        window.bloquearAgendaAdmin = async function() {
+            const dataBloq = document.getElementById('bloqueio-data').value;
+            const turnoBloq = document.getElementById('bloqueio-turno').value;
+
+            if (!dataBloq) {
+                alert('Selecione uma data para bloquear.');
+                return;
+            }
+
+            const bloqueioOS = {
+                id: 'BLOQUEIO',
+                cliente: '🔒 ZAGO (Agenda Bloqueada / Folga)',
+                categoria: 'Indisponível',
+                modo: 'Serviço Longo / Folga',
+                metros: 0,
+                valorBase: 0,
+                valorAdicional: 0,
+                valorTotal: 0,
+                data: dataBloq,
+                turno: turnoBloq,
+                status: 'Pendente',
+                observacoes: 'Bloqueio manual de agenda pelo administrador.',
+                criadoEm: new Date().toISOString()
+            };
+
+            try {
+                await addDoc(collection(db, "ordens"), bloqueioOS);
+                alert('Data e turno bloqueados com sucesso!');
+                document.getElementById('bloqueio-data').value = '';
+            } catch (erro) {
+                console.error("Erro ao bloquear agenda:", erro);
+                alert('Erro ao registrar bloqueio.');
+            }
+        }
+
+        window.mudarFiltroStatus = function(status) {
+            filtroStatusAtual = status;
+            ['Todos', 'Pendente', 'Concluída', 'Cancelada'].forEach(st => {
+                const btn = document.getElementById(`btn-filtro-${st}`);
+                if (st === status) {
+                    btn.className = "py-1.5 rounded-lg border bg-green-500 text-black border-green-500 shadow font-bold";
+                } else {
+                    btn.className = "py-1.5 rounded-lg border bg-zinc-900 text-gray-300 border-zinc-800 font-bold";
+                }
+            });
+            renderizarPainelAdmin();
+        }
+
+        window.carregarPainelAdmin = function() {
+            renderizarPainelAdmin();
+        }
+
+        function renderizarPainelAdmin() {
+            const container = document.getElementById('lista-os');
+            const elFaturamento = document.getElementById('faturamento-mes');
+            const elTotalOS = document.getElementById('total-os');
+            const buscaTexto = document.getElementById('busca-os').value.toLowerCase().trim();
+            const mesAnoSelecionado = document.getElementById('filtro-mes-ano').value;
+
+            let osFiltradasData = listaOrdensCache.filter(os => {
+                return os.data && os.data.startsWith(mesAnoSelecionado);
+            });
+
+            let faturamentoTotal = 0;
+            let qtdConcluida = 0;
+            let qtdPendente = 0;
+            let qtdCancelada = 0;
+
+            osFiltradasData.forEach(os => {
+                if(os.status === 'Concluída') {
+                    faturamentoTotal += (os.valorTotal || os.valorBase || 0);
+                    qtdConcluida++;
+                } else if(os.status === 'Pendente') {
+                    qtdPendente++;
+                } else if(os.status === 'Cancelada') {
+                    qtdCancelada++;
+                }
+            });
+
+            elFaturamento.innerText = `R$ ${faturamentoTotal.toFixed(2).replace('.', ',')}`;
+            elTotalOS.innerText = osFiltradasData.length;
+
+            document.getElementById('qtd-concluida').innerText = qtdConcluida;
+            document.getElementById('qtd-pendente').innerText = qtdPendente;
+            document.getElementById('qtd-cancelada').innerText = qtdCancelada;
+
+            const totalMes = osFiltradasData.length;
+            if (totalMes > 0) {
+                document.getElementById('barra-concluida').style.width = (qtdConcluida / totalMes * 100) + '%';
+                document.getElementById('barra-pendente').style.width = (qtdPendente / totalMes * 100) + '%';
+                document.getElementById('barra-cancelada').style.width = (qtdCancelada / totalMes * 100) + '%';
+            } else {
+                document.getElementById('barra-concluida').style.width = '0%';
+                document.getElementById('barra-pendente').style.width = '0%';
+                document.getElementById('barra-cancelada').style.width = '0%';
+            }
+
+            let osParaExibir = osFiltradasData;
+            if (filtroStatusAtual !== 'Todos') {
+                osParaExibir = osParaExibir.filter(os => os.status === filtroStatusAtual);
+            }
+
+            if (buscaTexto !== '') {
+                osParaExibir = osParaExibir.filter(os => 
+                    os.id.toLowerCase().includes(buscaTexto) ||
+                    (os.cliente && os.cliente.toLowerCase().includes(buscaTexto)) ||
+                    os.categoria.toLowerCase().includes(buscaTexto) ||
+                    (os.observacoes && os.observacoes.toLowerCase().includes(buscaTexto))
+                );
+            }
+
+            if (osParaExibir.length === 0) {
+                container.innerHTML = `<div class="text-center text-xs text-gray-500 py-8 bg-zinc-900/40 rounded-xl border border-zinc-800">Nenhuma Ordem de Serviço encontrada.</div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            osParaExibir.forEach((os) => {
+                let corStatus = 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30';
+                if (os.status === 'Concluída') corStatus = 'text-green-400 bg-green-400/10 border-green-400/30';
+                if (os.status === 'Cancelada') corStatus = 'text-red-400 bg-red-400/10 border-red-400/30';
+
+                const isBloqueio = os.id === 'BLOQUEIO';
+                const valorTotalCalc = (os.valorTotal || os.valorBase || 0);
+                const valorFormatado = valorTotalCalc.toFixed(2).replace('.', ',');
+
+                const card = document.createElement('div');
+                card.className = "bg-zinc-900 border border-zinc-800 rounded-xl p-3 shadow text-xs flex flex-col gap-2.5";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center font-bold">
+                        <span class="${isBloqueio ? 'text-red-400' : 'text-green-400'} font-mono text-sm">${os.id} - ${os.categoria}</span>
+                        <span class="px-2 py-0.5 rounded-full border text-[10px] ${corStatus}">${os.status}</span>
+                    </div>
+
+                    <div class="text-gray-300 space-y-1">
+                        <p>👤 <strong>${os.cliente || 'Não informado'}</strong></p>
+                        ${!isBloqueio ? `<p>✂️ ${os.modo} (${os.metros} m²)</p>` : ''}
+                        <p>📅 Data: <strong>${os.data.split('-').reverse().join('/')}</strong> (${os.turno})</p>
+                        ${!isBloqueio ? `<p>💰 Valor Total: <strong class="text-green-400 text-sm">R$ ${valorFormatado}</strong></p>` : ''}
+                    </div>
+
+                    ${!isBloqueio ? `
+                    <div class="bg-black/40 p-2 rounded-lg border border-zinc-800 flex items-center justify-between gap-2">
+                        <label class="text-[10px] text-gray-400">Adicional (Deslocamento/Extra):</label>
+                        <div class="flex items-center gap-1">
+                            <span class="text-gray-400 text-[10px]">R$</span>
+                            <input type="number" step="0.50" value="${os.valorAdicional || 0}" onchange="atualizarAdicionalOS('${os.firebaseId}', this.value)" class="w-16 bg-black border border-zinc-700 text-white text-center py-0.5 rounded text-[11px] focus:outline-none focus:border-green-500">
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <div>
+                        <label class="block text-[10px] text-gray-400 mb-1">Anotações / Notas:</label>
+                        <textarea onchange="salvarObservacaoOS('${os.firebaseId}', this.value)" placeholder="Digite observações..." class="w-full bg-black border border-zinc-800 text-gray-200 text-[11px] p-2 rounded-lg focus:outline-none focus:border-green-500 h-12 resize-none">${os.observacoes || ''}</textarea>
+                    </div>
+
+                    ${!isBloqueio ? `
+                    <button onclick="contatarClienteWhatsApp('${os.id}', '${os.categoria}', '${os.data}', '${valorFormatado}')" class="w-full bg-green-500/10 border border-green-500/30 text-green-400 font-bold py-1.5 rounded-lg hover:bg-green-500/20 transition-all text-[11px] flex items-center justify-center gap-1.5">
+                        💬 Lembrete / Mensagem no WhatsApp
+                    </button>
+                    ` : ''}
+
+                    <div class="flex gap-1.5 pt-1 border-t border-zinc-800">
+                        ${!isBloqueio ? `<button onclick="mudarStatusOS('${os.firebaseId}', 'Pendente')" class="flex-1 bg-yellow-500/20 text-yellow-300 py-1 rounded hover:bg-yellow-500/30 font-semibold text-[10px]">Pendente</button>` : ''}
+                        ${!isBloqueio ? `<button onclick="mudarStatusOS('${os.firebaseId}', 'Concluída')" class="flex-1 bg-green-500/20 text-green-300 py-1 rounded hover:bg-green-500/30 font-semibold text-[10px]">Concluir</button>` : ''}
+                        <button onclick="excluirOS('${os.firebaseId}')" class="flex-1 bg-red-500/20 text-red-300 py-1 rounded hover:bg-red-500/30 font-semibold text-[10px]">${isBloqueio ? 'Remover Bloqueio' : 'Cancelar/Excluir'}</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        window.mudarStatusOS = async function(firebaseId, novoStatus) {
+            try {
+                const refDoc = doc(db, "ordens", firebaseId);
+                await updateDoc(refDoc, { status: novoStatus });
+            } catch (erro) {
+                console.error("Erro ao atualizar status:", erro);
+            }
+        }
+
+        window.salvarObservacaoOS = async function(firebaseId, texto) {
+            try {
+                const refDoc = doc(db, "ordens", firebaseId);
+                await updateDoc(refDoc, { observacoes: texto });
+            } catch (erro) {
+                console.error("Erro ao salvar observação:", erro);
+            }
+        }
+
+        window.atualizarAdicionalOS = async function(firebaseId, valorAdicionalInput) {
+            const add = parseFloat(valorAdicionalInput) || 0;
+            const osEncontrada = listaOrdensCache.find(item => item.firebaseId === firebaseId);
+            if (osEncontrada) {
+                const base = osEncurtarBase(osEncontrada);
+                const novoTotal = base + add;
+                try {
+                    const refDoc = doc(db, "ordens", firebaseId);
+                    await updateDoc(refDoc, {
+                        valorAdicional: add,
+                        valorTotal: novoTotal
+                    });
+                } catch (erro) {
+                    console.error("Erro ao atualizar adicional:", erro);
+                }
+            }
+        }
+
+        function osEncurtarBase(os) {
+            const metros = os.metros || 0;
+            let baseM2 = 1.0;
+            if (os.categoria === 'Pomar') baseM2 = 0.80;
+            if (os.categoria === 'Casa') baseM2 = 1.20;
+            if (os.categoria === 'Pousada') baseM2 = 1.50;
+            if (os.categoria === 'Terreno / Outros') baseM2 = 1.20;
+            if (os.modo && os.modo.includes('Limpeza')) baseM2 += 0.30;
+            return metros * baseM2;
+        }
+
+        window.excluirOS = async function(firebaseId) {
+            if (confirm('Deseja realmente remover este registro / bloqueio da agenda?')) {
+                try {
+                    await deleteDoc(doc(db, "ordens", firebaseId));
+                } catch (erro) {
+                    console.error("Erro ao excluir:", erro);
+                    alert("Erro ao remover da nuvem.");
+                }
+            }
+        }
+
+        window.contatarClienteWhatsApp = function(id, categoria, data, valor) {
+            const dataFmt = data.split('-').reverse().join('/');
+            const msg = `Olá! Aqui é o Zago da AZ Manutenções. Passando para confirmar seu agendamento da *${id}* (${categoria}) previsto para o dia *${dataFmt}* no valor de *R$ ${valor}*. Tudo certo?`;
+            window.open(`https://api.whatsapp.com/send?phone=5549991810323&text=${encodeURIComponent(msg)}`, '_blank');
+        }
+    </script>
+</body>
+</html>
